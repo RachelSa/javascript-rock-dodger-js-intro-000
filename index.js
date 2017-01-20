@@ -46,6 +46,8 @@ function createRock(x) {
 
     rock.style.top = top
 
+    GAME.append(rock)
+
     /**
      * Now that we have a rock, we'll need to append
      * it to GAME and move it downwards.
@@ -57,14 +59,18 @@ function createRock(x) {
      * seems like a good pace.)
      */
     function moveRock() {
-      if (checkCollision(rock))
-       {endGame()}
+      if (checkCollision(rock)){
+        endGame()
+      }
+      else if (top < 400) {
+        rock.style.top = `${top += 2}px`
+        window.requestAnimationFrame(moveRock)
+      }
       else {
-        if (top < 400) {
-          top += 2
-       rock.style.top = top}
-   }
-   rock.remove()
+         rock.remove()
+      }  
+      
+  
       /**
        * If a rock collides with the DODGER,
        * we should call endGame()
@@ -107,18 +113,24 @@ window.alert("YOU LOSE!");
 
 function moveDodger(e) {
   if (e.which === LEFT_ARROW) {
+    e.preventDefault()
+    e.stopPropagation()
     window.moveDodgerLeft();
   }
   if (e.which === RIGHT_ARROW) {
+    e.preventDefault()
+    e.stopPropagation()
     window.moveDodgerRight();
     }
 }
 
 function moveDodgerLeft() {
-  var left = 180
-  function step(){
-    dodger.style.left = `${left -= 4}px`
+  var leftNumbers = dodger.style.left.replace('px', '')
+  var left = parseInt(leftNumbers, 10)
+
+  function step() {
     if (left > 0) {
+      dodger.style.left = `${left -= 4}px`
       window.requestAnimationFrame(step)
     }
   }
@@ -126,11 +138,14 @@ function moveDodgerLeft() {
 
 }
 
+
 function moveDodgerRight() {
-  var right = 180
+  var rightNumbers = dodger.style.left.replace('px', '')
+  var right = parseInt(rightNumbers, 10)
+
   function step(){
-    dodger.style.left = `${right += 4}px`
     if (right < 360) {
+      dodger.style.left = `${right += 4}px`
       window.requestAnimationFrame(step)
     }
   }
@@ -138,11 +153,6 @@ function moveDodgerRight() {
 
   }
 
-
-/**
- * @param {string} p The position property
- * @returns {number} The position as an integer (without 'px')
- */
 function positionToInteger(p) {
   return parseInt(p.split('px')[0]) || 0
 }
@@ -153,6 +163,6 @@ function start() {
   START.style.display = 'none'
 
   gameInterval = setInterval(function() {
-    createRock(Math.floor(Math.random() *  (GAME_WIDTH - 20)))
+    createRock(Math.floor(Math.random() * (GAME_WIDTH - 20)))
   }, 1000)
 }
